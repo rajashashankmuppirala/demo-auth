@@ -1,0 +1,17 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          okta:
+            clientId: ${client_id}
+            clientSecret: ${client_secret}
+            scope: openid profile email
+
+        provider:
+          okta:
+            name: okta
+            authorizationUri: ${okta_domain}/oauth2/default/v1/authorize
+            tokenUri: ${okta_domain}/oauth2/default/v1/token
+            userInfoUri: ${okta_domain}/oauth2/default/v1/userinfo
+            revokeTokenUri: ${okta_domain}/oauth2/default/v1/revoke
