@@ -13,7 +13,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
@@ -29,6 +32,9 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    ClientDetailsService clientDetailsService;
+
 
     @Bean
     public TokenStore tokenStore() {
@@ -39,6 +45,19 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
             log.error("Error occured in tokenStore {}"+e);
             throw e;
         }
+    }
+
+
+    @Bean
+    public DefaultTokenServices tokenServices() {
+        DefaultTokenServices tokenService = new DefaultTokenServices();
+        tokenService.setTokenStore(tokenStore());
+        tokenService.setSupportRefreshToken(true);
+        return tokenService;
+    }
+    @Bean
+    DefaultOAuth2RequestFactory defaultOAuth2RequestFactory() {
+        return new DefaultOAuth2RequestFactory(clientDetailsService);
     }
 
     @Bean
@@ -74,7 +93,8 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         try {
-            endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager);//.userDetailsService(userDetailsService);
+            endpoints.tokenStore(tokenStore()).authenticationManager(authenticationManager)
+            .tokenServices(tokenServices());//.userDetailsService(userDetailsService);
             endpoints.exceptionTranslator(exception -> {
                 if (exception instanceof OAuth2Exception) {
                     OAuth2Exception oAuth2Exception = (OAuth2Exception) exception;
