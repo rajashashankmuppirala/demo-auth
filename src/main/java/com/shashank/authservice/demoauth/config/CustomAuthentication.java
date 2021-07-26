@@ -33,7 +33,7 @@ import java.util.*;
 @Slf4j
 public class CustomAuthentication implements AuthenticationProvider {
 
-	public AccessTokenProvider userAccessTokenProvider() {
+	private AccessTokenProvider userAccessTokenProvider() {
 		ResourceOwnerPasswordAccessTokenProvider accessTokenProvider = new ResourceOwnerPasswordAccessTokenProvider();
 		return accessTokenProvider;
 	}
@@ -70,9 +70,8 @@ public class CustomAuthentication implements AuthenticationProvider {
 			resource.setScope(scopes);
 
 			// Generate an access token
-			final OAuth2RestTemplate template = new OAuth2RestTemplate(resource, new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest()));
+			final OAuth2RestTemplate template = new OAuth2RestTemplate(resource);
 			template.setAccessTokenProvider(userAccessTokenProvider());
-
 			OAuth2AccessToken accessToken = null;
 
 			try {
