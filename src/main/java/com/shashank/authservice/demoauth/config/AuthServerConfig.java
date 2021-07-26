@@ -87,7 +87,12 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .inMemory()
                 .withClient("test").secret(passwordEncoder.encode("123456"))
                 .scopes("read")
-                .authorizedGrantTypes("password", "authorization_code", "refresh_token");
+                .authorizedGrantTypes("password", "refresh_token")
+
+                .and()
+                .withClient("cli").secret(passwordEncoder.encode("123456"))
+                .scopes("read")
+                .authorizedGrantTypes("password", "refresh_token");
     }
 
     @Override
